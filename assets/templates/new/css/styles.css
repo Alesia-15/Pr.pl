@@ -1,13 +1,13 @@
 @font-face {
   font-family: "Inter";
-  src: url("assets/fonts/Inter/Inter-Regular.woff2") format("woff2");
+  src: url("/Pr.pl/assets/fonts/Inter/Inter-Regular.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Inter";
-  src: url("assets/fonts/Inter/Inter-SemiBold.woff2") format("woff2");
+  src: url("/Pr.pl/assets/fonts/Inter/Inter-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-display: swap;
 }
@@ -308,7 +308,7 @@ input[type="email"] {
   font-size: 0.9rem;
 }
 #calculator .calculator .calc-bg {
-  background: url(assets/templates/privoz/images/update.png) no-repeat center;
+  background: url(/Pr.pl/assets/templates/privoz/images/update.png) no-repeat center;
 }
 #calculator .valuta {
   padding-left: 5px;
@@ -404,17 +404,17 @@ input[type="email"] {
   text-align: center;
 }
 #contact .viber-chat {
-  background: url(assets/images/viber.png) no-repeat 50% 55%;
+  background: url(/Pr.pl/assets/images/viber.png) no-repeat 50% 55%;
   background-size: 70%;
 }
 header .phones .chats .telegram-chat,
 #contact .telegram-chat {
-  background: url(assets/images/telegram.png) no-repeat 45% 50%;
+  background: url(/Pr.pl/assets/images/telegram.png) no-repeat 45% 50%;
   background-size: 70%;
 }
 header .phones .chats .whatsapp-chat,
 #contact .whatsapp-chat {
-  background: url(assets/images/WhatsApp.png) no-repeat 50% 55%;
+  background: url(/Pr.pl/assets/images/WhatsApp.png) no-repeat 50% 55%;
   background-size: 70%;
   margin-right: 0;
 }
