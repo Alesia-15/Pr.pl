@@ -1,0 +1,157 @@
+RewriteEngine On
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
+#php_value auto_prepend_file "/home/privoz/domains/privoz.pl/lor_protect/lor_o.php"
+
+# RWR v20170403
+
+RewriteEngine On
+
+# Redirect from www ---------------------------------------------------------------------
+
+#RewriteBase /
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+# RewriteRule ^page1.html$ /page2.html [R=301,L]
+RewriteRule ^\/informaciya\/katalog-internet-magazinov\.html$ https://katalog-magazinov.html? [R=301,L]
+
+# Config --------------------------------------------------------------------------------
+
+RewriteCond %{HTTP_USER_AGENT} ":s:[0-9]+:" [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} "JDatabaseDriver" [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} "NT 5.1; SV1" [NC]
+RewriteRule .* - [F,L]
+
+RewriteCond %{HTTP:X-FORWARDED-FOR} ":s:[0-9]+:" [NC,OR]
+RewriteCond %{HTTP:X-FORWARDED-FOR} "JDatabaseDriver" [NC]
+RewriteRule .* - [F,L]
+
+RewriteCond %{HTTP_USER_AGENT} (MJ12Bot/v|Linkpad|Semrush) [NC]
+RewriteRule .* - [F,L]
+
+# s-0001
+<IfModule autoindex_module.c>
+IndexIgnore *
+</IfModule>
+
+# s-0002
+ServerSignature Off
+Options -Indexes
+
+# s-0003
+ErrorDocument 400 default
+ErrorDocument 401 default
+ErrorDocument 403 "Forbidden"
+
+# WAF Rules -----------------------------------------------------------------------------
+
+# Block methods
+# s-0005 
+RewriteCond %{REQUEST_METHOD} ^(TRACE|DELETE|TRACK|DEBUG) [NC]
+RewriteRule .* - [F,L]
+
+# Apache range security problem
+# s-0006
+RewriteCond %{REQUEST_METHOD} ^(HEAD|GET) [NC]
+RewriteCond %{HTTP:Range} ([0-9]*-[0-9]*)(\s*,\s*[0-9]*-[0-9]*)+
+RewriteRule .* - [F]
+
+# Shellshock
+RewriteCond %{QUERY_STRING} (\s*)\s*{\s*:;\s*};
+RewriteCond %{THE_REQUEST} (\s*)\s*{\s*:;\s*};
+RewriteCond %{HTTP_REFERER} (\s*)\s*{\s*:;\s*};
+RewriteCond %{HTTP_USER_AGENT} (\s*)\s*{\s*:;\s*};
+RewriteRule .* - [F,L]
+
+# Block sensitive files
+# s-0015
+<FilesMatch "\.(cfg|pl|htaccess|htpasswd|ini|phps|fla|psd|log|sh|sql|inc|tpl|svn|git|cvs|phtml|asp|)$">
+Order Allow,Deny
+Deny from All
+</FilesMatch>
+
+# Allow font assets to be used across domains and subdomains
+<FilesMatch "\.(ttf|otf|eot|woff)$">
+  <IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+  </IfModule>
+</FilesMatch>
+
+
+# Block sensitive files
+# s-0016
+<FilesMatch "\.(cgi)$">
+Order Allow,Deny
+Deny from All
+</FilesMatch>
+
+# Block parasite traffic
+# s-0018
+RewriteCond %{HTTP_REFERER} iskalko\.ru [NC,OR]
+RewriteCond %{HTTP_REFERER} buttons-for-website\.com
+RewriteCond %{HTTP_REFERER} semalt.semalt\.com
+RewriteCond %{HTTP_REFERER} cenoval\.ru
+RewriteCond %{HTTP_REFERER} darodar\.com
+RewriteCond %{HTTP_REFERER} cenokos\.ru
+RewriteCond %{HTTP_REFERER} seoexperimenty\.ru
+RewriteCond %{HTTP_REFERER} gobongo\.info
+RewriteCond %{HTTP_REFERER} adcash\.com
+RewriteCond %{HTTP_REFERER} websocial\.me
+RewriteCond %{HTTP_REFERER} cityadspix\.com
+RewriteCond %{HTTP_REFERER} luxup\.ru
+RewriteCond %{HTTP_REFERER} superiends\.org
+RewriteCond %{HTTP_REFERER} socialseet\.ru
+RewriteCond %{HTTP_REFERER} screentoolkit\.com
+RewriteCond %{HTTP_REFERER} cur\.lv
+RewriteRule .* - [F]
+
+###########################################################################
+
+# For full documentation and other suggested options, please see
+# http://svn.modxcms.com/docs/display/MODx096/Friendly+URL+Solutions
+# including for unexpected logouts in multi-server/cloud environments
+# and especially for the first three commented out rules
+
+#php_flag register_globals Off
+AddDefaultCharset utf-8
+#php_value date.timezone Europe/Moscow
+
+Options +FollowSymlinks
+
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{HTTPS} !=on
+RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
+
+# Fix Apache internal dummy connections from breaking [(site_url)] cache
+###RewriteCond %{HTTP_USER_AGENT} ^.*internal\ dummy\ connection.*$ [NC]
+###RewriteRule .* - [F,L]
+
+# Rewrite domain.com -> www.domain.com -- used with SEO Strict URLs plugin
+#RewriteCond %{HTTP_HOST} .
+#RewriteCond %{HTTP_HOST} !^www\.example\.com [NC]
+#RewriteRule (.*) http://www.example.com/$1 [R=301,L]
+
+# without www
+#RewriteCond %{HTTP_HOST} .
+#RewriteCond %{HTTP_HOST} !^example\.com [NC]
+#RewriteRule (.*) http://example.com/$1 [R=301,L]
+
+# without www  all domian
+#RewriteCond %{HTTP_HOST} .
+#RewriteCond %{HTTP_HOST} ^www.(.*)$ [NC]
+#RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
+# Exclude /assets and /manager directories and images from rewrite rules
+RewriteRule ^(manager|assets|js|css|images|img)/.*$ - [L]
+RewriteRule \.(jpg|jpeg|png|gif|ico)$ - [L]
+
+# For Friendly URLs
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+
+# Reduce server overhead by enabling output compression if supported.
+#php_flag zlib.output_compression On
+#php_value zlib.output_compression_level 5

@@ -1,0 +1,13 @@
+<IfModule mod_php4.c>
+php_flag engine 0
+</IfModule>
+	
+<IfModule mod_php5.c>
+php_flag engine 0
+</IfModule>
+	
+Order Allow,Deny
+Deny from all
+<Files ~ ".(svg|ttf|woff|csv|xml|rar|jpe?g|mp3|txt|mp4|pdf|flv|png|doc|docx|xls|xlsx|wav|bmp|BMP|gif|ai|swf|zip|css|avi|ico|mpg|JPE?G|GIF|PNG|js)$">
+Allow from all
+</Files>
